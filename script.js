@@ -66,7 +66,8 @@ function removeEntry(id) {
     let entries = JSON.parse(localStorage.getItem('entries')) || [];
     entries = entries.filter(entry => entry.id !== id);
     localStorage.setItem('entries', JSON.stringify(entries));
-    loadAndUpdate();
+    document.querySelector(`li[data-id='${id}']`).remove();
+    updateTotalAmount();
 }
 
 function updateTotalAmount() {
@@ -81,10 +82,4 @@ function clearForm() {
     document.getElementById('category').value = 'savings';
     document.getElementById('date').value = '';
     document.getElementById('notes').value = '';
-}
-
-function loadAndUpdate() {
-    document.getElementById('entryList').innerHTML = '';
-    loadEntries();
-    updateTotalAmount();
 }
