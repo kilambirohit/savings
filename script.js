@@ -20,6 +20,7 @@ function addEntry() {
     }
 
     const entry = {
+        id: Date.now(),
         amount: amount.toFixed(2),
         category,
         date,
@@ -47,6 +48,7 @@ function loadEntries() {
 function displayEntry(entry) {
     const entryList = document.getElementById('entryList');
     const entryItem = document.createElement('li');
+    entryItem.dataset.id = entry.id;
 
     entryItem.innerHTML = `
         <div class="details">
@@ -55,25 +57,16 @@ function displayEntry(entry) {
             <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
             ${entry.notes ? `<div class="notes">${entry.notes}</div>` : ''}
         </div>
-        <button onclick="removeEntry(this, ${entry.amount})">Remove</button>
+        <button onclick="removeEntry(${entry.id})">Remove</button>
     `;
     entryList.appendChild(entryItem);
 }
 
-function removeEntry(button, amount) {
-    const entryItem = button.parentElement;
-    entryItem.remove();
-    deleteEntry(entryItem);
-    updateTotalAmount();
-}
-
-function deleteEntry(entryItem) {
+function removeEntry(id) {
     let entries = JSON.parse(localStorage.getItem('entries')) || [];
-    const amount = entryItem.querySelector('.amount').textContent.replace('₹', '');
-    const date = new Date(entryItem.querySelector('.date').textContent).toISOString().split('T')[0];
-
-    entries = entries.filter(entry => !(entry.amount === amount && entry.date === date));
+    entries = entries.filter(entry => entry.id !== id);
     localStorage.setItem('entries', JSON.stringify(entries));
+    loadAndUpdate();
 }
 
 function updateTotalAmount() {
@@ -88,4 +81,10 @@ function clearForm() {
     document.getElementById('category').value = 'savings';
     document.getElementById('date').value = '';
     document.getElementById('notes').value = '';
+}
+
+function loadAndUpdate() {
+    document.getElementById('entryList').innerHTML = '';
+    loadEntries();
+    updateTotalAmount();
 }
